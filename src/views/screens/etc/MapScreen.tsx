@@ -231,8 +231,6 @@ const MapScreen = ({ navigation, route }: MapScreenProps) => {
             let hospitalArray: any[] = [];
             if (Array.isArray(response)) {
                 hospitalArray = response;
-            } else if (response.data && Array.isArray(response.data)) {
-                hospitalArray = response.data;
             } else {
                 console.warn('예상하지 못한 응답 형태:', response);
                 setHospitals([]);

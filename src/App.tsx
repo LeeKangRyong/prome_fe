@@ -6,17 +6,27 @@ import { StatusBar, Animated } from 'react-native';
 import Colors from './views/styles/Colors';
 import StartScreen from './views/screens/auth/StartScreen';
 
-const AppStateContext = createContext();
+interface AppStateContextType {
+  isAppReady: boolean;
+}
 
-export const useAppState = () => useContext(AppStateContext);
+const AppStateContext = createContext<AppStateContextType | undefined>(undefined);
 
-const App = () => {
-  const [showSplash, setShowSplash] = useState(true);
-  const [isAppReady, setIsAppReady] = useState(false);
-  const [fadeAnim] = useState(new Animated.Value(1));
-  const [mainFadeAnim] = useState(new Animated.Value(0));
+export const useAppState = (): AppStateContextType => {
+  const context = useContext(AppStateContext);
+  if (!context) {
+    throw new Error('useAppState must be used within AppStateContext.Provider');
+  }
+  return context;
+};
 
-  const handleSplashFinish = () => {
+const App: React.FC = () => {
+  const [showSplash, setShowSplash] = useState<boolean>(true);
+  const [isAppReady, setIsAppReady] = useState<boolean>(false);
+  const [fadeAnim] = useState<Animated.Value>(new Animated.Value(1));
+  const [mainFadeAnim] = useState<Animated.Value>(new Animated.Value(0));
+
+  const handleSplashFinish = (): void => {
     Animated.timing(mainFadeAnim, {
       toValue: 1,
       duration: 300,

@@ -4,6 +4,7 @@ interface Login {
     success: boolean;
     accessToken: string;
     user: User;
+    message?: string;
 }
 
 interface Register {

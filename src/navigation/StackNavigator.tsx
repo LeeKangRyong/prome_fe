@@ -16,52 +16,65 @@ import DiagResultHistoryScreen from '../views/screens/diag/DiagResultHistoryScre
 import MainScreen from '../views/screens/etc/MainScreen';
 import MapScreen from '../views/screens/etc/MapScreen';
 
-const Stack = createNativeStackNavigator();
+import { RootStackParamList } from '@/types';
 
-const StackNavigator = () => {
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const StackNavigator: React.FC = () => {
     return (
         <Stack.Navigator initialRouteName="Next">
-            <Stack.Screen name="Login"
+            <Stack.Screen
+                name="Login"
                 component={LoginScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="Register"
+            <Stack.Screen
+                name="Register"
                 component={RegisterScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="Chat"
+            <Stack.Screen
+                name="Chat"
                 component={ChatRoomScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="ChatPeriod"
+            <Stack.Screen
+                name="ChatPeriod"
                 component={ChatPeriodSelectScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="ChatMost"
+            <Stack.Screen
+                name="ChatMost"
                 component={ChatMostScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="ChatHistory"
+            <Stack.Screen
+                name="ChatHistory"
                 component={ChatRoomHistoryScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="Diag"
+            <Stack.Screen
+                name="Diag"
                 component={DiagScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="DiagResult"
+            <Stack.Screen
+                name="DiagResult"
                 component={DiagResultHistoryScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="Main"
+            <Stack.Screen
+                name="Main"
                 component={MainScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="Map"
+            <Stack.Screen
+                name="Map"
                 component={MapScreen}
-                options={{ headerShown: false, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none' }}
             />
-            <Stack.Screen name="Next"
+            <Stack.Screen
+                name="Next"
                 component={NextScreen}
                 options={{ headerShown: false, animation: 'none' }}
             />
