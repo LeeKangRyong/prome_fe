@@ -1,4 +1,6 @@
-const mockUser = {
+import type { User, Chat, ChatMessage } from '@/types';
+
+const mockUser: User = {
     user_id: 1,
     id: 'test1',
     name: '테스트',
@@ -7,7 +9,7 @@ const mockUser = {
     phone: '010-1234-5678',
 };
 
-const mockChats = [
+const mockChats: Chat[] = [
     { chat_id: 1, title: '두통 상담', created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
     { chat_id: 2, title: '감기 증상', created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
     { chat_id: 3, title: '소화불량', created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString() },
@@ -17,7 +19,7 @@ const mockChats = [
     { chat_id: 7, title: '눈 충혈', created_at: new Date(Date.now() - 80 * 24 * 60 * 60 * 1000).toISOString() },
 ];
 
-const mockChatHistory = {
+const mockChatHistory: Record<number, ChatMessage[]> = {
     1: [
         { content_id: 1, content: '머리가 너무 아파요', is_question: true, is_diag: false, is_recommend: false, temp: 36.8, ecg: 0, created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
         { content_id: 2, content: '두통이 언제부터 시작되었나요?', is_question: false, is_diag: false, is_recommend: false, temp: null, ecg: null, created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 5000).toISOString() },
@@ -62,6 +64,6 @@ const mockChatHistory = {
     ],
 };
 
-const USE_MOCK = true;
+const USE_MOCK: boolean = true;
 
 export { mockUser, mockChats, mockChatHistory, USE_MOCK };
