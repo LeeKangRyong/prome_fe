@@ -5,6 +5,33 @@ import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
 import Back from '../../common/Back';
 import { getAllChats } from '../../../models/chat';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChatMessage } from '@/types';
+
+interface DiagResultHistoryScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+}
+
+interface DiagBadgeProps {
+    isDiag: boolean;
+}
+
+interface DiagValueTextProps {
+    type: string;
+}
+
+interface ChatRoom {
+    chat_id: number;
+    title: string;
+    history: ChatMessage[];
+}
+
+interface DiagItem {
+    chat_id: number;
+    question: ChatMessage;
+    answer: ChatMessage | null;
+    chatTitle: string;
+}
 
 const Container = styled(SafeAreaView)`
     flex: 1;
@@ -62,7 +89,7 @@ const DiagDate = styled.Text`
     font-weight: 500;
 `;
 
-const DiagBadge = styled.View`
+const DiagBadge = styled.View<DiagBadgeProps>`
     background-color: ${props => props.isDiag ? Colors.primary : '#17a2b8'};
     border-radius: 12px;
     padding: 4px 8px;
@@ -110,7 +137,7 @@ const DiagValueLabel = styled.Text`
     margin-bottom: 4px;
 `;
 
-const DiagValueText = styled.Text`
+const DiagValueText = styled.Text<DiagValueTextProps>`
     font-size: 16px;
     font-weight: bold;
     color: ${props => props.type === 'temp' ? '#dc3545' : '#28a745'};
@@ -149,8 +176,8 @@ const LoadingText = styled.Text`
     margin-top: 16px;
 `;
 
-const DiagResultHistoryScreen = ({ navigation }) => {
-    const [diagHistory, setDiagHistory] = useState([]);
+const DiagResultHistoryScreen = ({ navigation }: DiagResultHistoryScreenProps) => {
+    const [diagHistory, setDiagHistory] = useState<DiagItem[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -163,11 +190,11 @@ const DiagResultHistoryScreen = ({ navigation }) => {
             const response = await getAllChats();
 
             if (response && response.success && response.data) {
-                const diagData = [];
+                const diagData: DiagItem[] = [];
 
-                response.data.forEach(chatRoom => {
-                    chatRoom.history.forEach(comment => {
-                        if (comment.is_question && 
+                (response.data as unknown as ChatRoom[]).forEach((chatRoom) => {
+                    chatRoom.history.forEach((comment: ChatMessage) => {
+                        if (comment.is_question &&
                             (comment.temp !== null && comment.temp !== 0) ||
                             (comment.ecg !== null && comment.ecg !== -1)) {
 
@@ -188,7 +215,7 @@ const DiagResultHistoryScreen = ({ navigation }) => {
                 });
 
                 diagData.sort((a, b) =>
-                    new Date(b.question.created_at) - new Date(a.question.created_at)
+                    new Date(b.question.created_at).getTime() - new Date(a.question.created_at).getTime()
                 );
 
                 setDiagHistory(diagData);
@@ -201,10 +228,10 @@ const DiagResultHistoryScreen = ({ navigation }) => {
         }
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
-        const diffTime = Math.abs(now - date);
+        const diffTime = Math.abs(now.getTime() - date.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
         if (diffDays === 1) {
@@ -218,23 +245,27 @@ const DiagResultHistoryScreen = ({ navigation }) => {
         }
     };
 
-    const getEcgText = (ecgValue) => {
+    const getEcgText = (ecgValue: number | null) => {
+        if (ecgValue === null) {
+            return '미기록';
+        }
+
         const ecgOptions = ['정상', '심방성 부정맥 의심', '심실성 부정맥 의심', '융합 박동', '알 수 없음'];
         return ecgValue >= 0 && ecgValue < ecgOptions.length ? ecgOptions[ecgValue] : '미기록';
     };
 
-    const handleDiagPress = (item) => {
+    const handleDiagPress = (item: DiagItem) => {
         navigation.navigate('ChatHistory', {
             chatId: item.chat_id,
             chatTitle: item.chatTitle,
         });
     };
 
-    const renderDiagItem = ({ item }) => (
+    const renderDiagItem = ({ item }: { item: DiagItem }) => (
         <DiagHistoryItem onPress={() => handleDiagPress(item)}>
             <DiagHistoryHeader>
                 <DiagDate>{formatDate(item.question.created_at)}</DiagDate>
-                <DiagBadge isDiag={item.answer?.is_diag}>
+                <DiagBadge isDiag={item.answer?.is_diag ?? false}>
                     <DiagBadgeText>
                         {item.answer?.is_diag ? '진단' : '상담'}
                     </DiagBadgeText>

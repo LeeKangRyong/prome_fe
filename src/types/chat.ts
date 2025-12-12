@@ -4,6 +4,13 @@ interface Chat {
     created_at: string;
 }
 
+interface ChatWithHistory {
+    chat_id: number;
+    title: string;
+    created_at: string;
+    history: ChatMessage[];
+}
+
 interface ChatMessage {
     content_id: number;
     content: string;
@@ -39,7 +46,7 @@ interface GetChat {
 
 interface GetAllChats {
     success: boolean;
-    data: Chat[];
+    data: ChatWithHistory[];
 }
 
-export type { Chat, ChatMessage, ChatAnswer, Ask, GetChat, GetAllChats };
+export type { Chat, ChatWithHistory, ChatMessage, ChatAnswer, Ask, GetChat, GetAllChats };

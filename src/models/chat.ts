@@ -2,8 +2,9 @@ import BASE_URL from '../config/config';
 import axios from 'axios';
 import { useAuthStore } from '../store/store';
 import { mockChatHistory, mockChats, USE_MOCK } from '../config/mock';
+import type { Ask, GetChat, GetAllChats, Chat } from '../types/chat';
 
-export const ask = async (content, chatId = null) => {
+export const ask = async (content: string, chatId: number | null = null): Promise<Ask> => {
     if (USE_MOCK) {
         return {
             success: true,
@@ -41,10 +42,9 @@ export const ask = async (content, chatId = null) => {
     }
 };
 
-// getChatAll 함수를 getAllChats로 변경하고 period API를 사용
-export const getAllChats = async (days = 365) => {  // 기본값을 1년으로 설정해서 전체 조회
+export const getAllChats = async (days: number = 365): Promise<GetAllChats> => {
     if (USE_MOCK) {
-        const chatsWithHistory = mockChats.map(chat => ({
+        const chatsWithHistory = mockChats.map((chat: Chat) => ({
             ...chat,
             history: mockChatHistory[chat.chat_id] || [],
         }));
@@ -73,12 +73,12 @@ export const getAllChats = async (days = 365) => {  // 기본값을 1년으로 �
     }
 };
 
-export const getChat = async (chatId) => {
+export const getChat = async (chatId: number): Promise<GetChat> => {
     if (USE_MOCK) {
         return {
             success: true,
             data: {
-                title: mockChats.find(c => c.chat_id === chatId)?.title || '채팅',
+                title: mockChats.find((c: Chat) => c.chat_id === chatId)?.title || '채팅',
                 history: mockChatHistory[chatId] || [],
             },
         };
@@ -105,10 +105,15 @@ export const getChat = async (chatId) => {
     }
 };
 
-export const getChat7Period = async () => {
+export const getChat7Period = async (): Promise<GetAllChats> => {
     if (USE_MOCK) {
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        const filtered = mockChats.filter(c => new Date(c.created_at) >= sevenDaysAgo);
+        const filtered = mockChats
+            .filter((c: Chat) => new Date(c.created_at) >= sevenDaysAgo)
+            .map((chat: Chat) => ({
+                ...chat,
+                history: mockChatHistory[chat.chat_id] || [],
+            }));
         return { success: true, data: filtered };
     }
 
@@ -134,10 +139,15 @@ export const getChat7Period = async () => {
     }
 };
 
-export const getChat30Period = async () => {
+export const getChat30Period = async (): Promise<GetAllChats> => {
     if (USE_MOCK) {
         const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-        const filtered = mockChats.filter(c => new Date(c.created_at) >= thirtyDaysAgo);
+        const filtered = mockChats
+            .filter((c: Chat) => new Date(c.created_at) >= thirtyDaysAgo)
+            .map((chat: Chat) => ({
+                ...chat,
+                history: mockChatHistory[chat.chat_id] || [],
+            }));
         return { success: true, data: filtered };
     }
 
@@ -163,10 +173,15 @@ export const getChat30Period = async () => {
     }
 };
 
-export const getChatByPeriod = async (days) => {
+export const getChatByPeriod = async (days: number): Promise<GetAllChats> => {
     if (USE_MOCK) {
         const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-        const filtered = mockChats.filter(c => new Date(c.created_at) >= cutoff);
+        const filtered = mockChats
+            .filter((c: Chat) => new Date(c.created_at) >= cutoff)
+            .map((chat: Chat) => ({
+                ...chat,
+                history: mockChatHistory[chat.chat_id] || [],
+            }));
         return { success: true, data: filtered };
     }
 

@@ -8,8 +8,12 @@ const Container = styled.View`
     background-color: #000;
 `;
 
-const StartScreen = ({ onFinish }) => {
-    const [videoEnded, setVideoEnded] = useState(false);
+interface StartScreenProps {
+    onFinish: () => void;
+}
+
+const StartScreen = ({ onFinish }: StartScreenProps) => {
+    const [_videoEnded, setVideoEnded] = useState(false);
 
     const handleVideoEnd = () => {
         setVideoEnded(true);

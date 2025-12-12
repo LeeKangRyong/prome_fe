@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
+import LinearGradient, { LinearGradientProps } from 'react-native-linear-gradient';
 import { TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Keyboard, Alert } from 'react-native';
 import useFullScreen from '../../hooks/useFullScreen';
 import { login } from '../../../models/auth';
 import { useAuthStore, useUserStore } from '../../../store/store';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface LoginScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+}
+
+interface TopProps {
+    keyboardVisible: boolean;
+}
+
+interface LoginButtonProps {
+    disabled: boolean;
+}
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -18,7 +31,7 @@ const Container = styled.View`
     flex: 1;
 `;
 
-const Top = styled.View`
+const Top = styled.View<TopProps>`
     height: ${props => props.keyboardVisible ? '15%' : '25%'};
     justify-content: center;
     align-items: center;
@@ -36,7 +49,7 @@ const Gradient = styled(LinearGradient).attrs({
     left: 0;
     right: 0;
     bottom: 0;
-`;
+`as React.ComponentType<Partial<LinearGradientProps>>;
 
 const Title = styled.Text`
     font-size: 32px;
@@ -79,7 +92,7 @@ const Input = styled.TextInput`
     color: #333;
 `;
 
-const LoginButton = styled(TouchableOpacity)`
+const LoginButton = styled(TouchableOpacity)<LoginButtonProps>`
     background-color: ${Colors.primary};
     height: 50px;
     border-radius: 8px;
@@ -125,7 +138,7 @@ const TestBlock = styled.View`
     margin-top: 20px;
 `;
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({ navigation }: LoginScreenProps) => {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [keyboardVisible, setKeyboardVisible] = useState(false);

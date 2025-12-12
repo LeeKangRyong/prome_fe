@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, Image, Alert, Modal, TextInput } from 'react-native';
+import { TouchableOpacity, Image, Alert, Modal, TextInput, ImageSourcePropType } from 'react-native';
 import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface DiagResultScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+    closeModal?: () => void;
+}
+
+interface OptionButtonProps {
+    selected: boolean;
+}
+
+interface OptionTextProps {
+    selected: boolean;
+}
 
 const Container = styled.View`
     flex: 1;
@@ -156,7 +170,7 @@ const SelectionContainer = styled.View`
     margin-bottom: 20px;
 `;
 
-const OptionButton = styled(TouchableOpacity)`
+const OptionButton = styled(TouchableOpacity)<OptionButtonProps>`
     background-color: ${props => props.selected ? Colors.primary : 'white'};
     border: 2px solid ${Colors.primary};
     border-radius: 8px;
@@ -166,7 +180,7 @@ const OptionButton = styled(TouchableOpacity)`
     justify-content: center;
 `;
 
-const OptionText = styled.Text`
+const OptionText = styled.Text<OptionTextProps>`
     font-size: 16px;
     font-weight: 600;
     color: ${props => props.selected ? 'white' : '#333'};
@@ -208,7 +222,7 @@ const SaveButtonText = styled(ModalButtonText)`
     color: white;
 `;
 
-const DiagResultScreen = ({ navigation, closeModal }) => {
+const DiagResultScreen = ({ navigation, closeModal }: DiagResultScreenProps) => {
     const [temperature, setTemperature] = useState('');
     const [ecgResult, setEcgResult] = useState('');
 
@@ -226,8 +240,8 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
         '알 수 없음',
     ];
 
-    const getEcgImage = (ecgR) => {
-        const imageMap = {
+    const getEcgImage = (ecgR: string): ImageSourcePropType | undefined => {
+        const imageMap: Record<string, ImageSourcePropType> = {
             '정상': require('../../../assets/diag_0.png'),
             '심방성 부정맥 의심': require('../../../assets/diag_1.png'),
             '심실성 부정맥 의심': require('../../../assets/diag_2.png'),
@@ -237,16 +251,15 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
         return imageMap[ecgR];
     };
 
-    // ECG 결과를 숫자로 변환하는 함수
-    const getEcgCode = (ecgR) => {
-        const ecgMap = {
+    const getEcgCode = (ecgR: string): number => {
+        const ecgMap: Record<string, number> = {
             '정상': 0,
             '심방성 부정맥 의심': 1,
             '심실성 부정맥 의심': 2,
             '융합 박동': 3,
             '알 수 없음': 4,
         };
-        return ecgMap[ecgR] || 4;
+        return ecgMap[ecgR] ?? 4;
     };
 
     const openTempModal = () => {

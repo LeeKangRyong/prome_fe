@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, PermissionsAndroid, Platform, Text, Modal } from 'react-native';
+import { View, PermissionsAndroid, Platform, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import { NaverMapView, NaverMapMarkerOverlay } from '@mj-studio/react-native-naver-map';
@@ -7,6 +7,49 @@ import Geolocation from '@react-native-community/geolocation';
 import Colors from '../../styles/Colors';
 import Back from '../../common/Back';
 import { totalMap, heartMap } from '../../../models/hospital';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface MapScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+    route: {
+        params?: {
+            hospitalType?: string;
+        };
+    };
+}
+
+interface Location {
+    latitude: number;
+    longitude: number;
+}
+
+interface Camera {
+    latitude: number;
+    longitude: number;
+    zoom: number;
+}
+
+interface Hospital {
+    id: number;
+    name: string;
+    address: string;
+    telephone: string;
+    post: string;
+    latitude: number;
+    longitude: number;
+    department: string;
+    type: string;
+    distance?: number;
+    distanceFromUser?: number;
+}
+
+interface ModalButtonProps {
+    primary?: boolean;
+}
+
+interface ModalButtonTextProps {
+    primary?: boolean;
+}
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -65,7 +108,6 @@ const BackWrapper = styled.View`
     z-index: 1000;
 `;
 
-// 모달 스타일들
 const ModalOverlay = styled.View`
     flex: 1;
     background-color: rgba(0, 0, 0, 0.5);
@@ -132,7 +174,7 @@ const ModalButtons = styled.View`
     gap: 15px;
 `;
 
-const ModalButton = styled.TouchableOpacity`
+const ModalButton = styled.TouchableOpacity<ModalButtonProps>`
     flex: 1;
     padding: 12px;
     border-radius: 10px;
@@ -141,25 +183,25 @@ const ModalButton = styled.TouchableOpacity`
     background-color: ${props => props.primary ? Colors.primary : '#F5F5F5'};
 `;
 
-const ModalButtonText = styled.Text`
+const ModalButtonText = styled.Text<ModalButtonTextProps>`
     font-size: 16px;
     font-weight: 600;
     color: ${props => props.primary ? 'white' : '#666'};
 `;
 
-const MapScreen = ({ navigation, route }) => {
-    const [currentLocation, setCurrentLocation] = useState(null);
-    const [mapRef, setMapRef] = useState(null);
+const MapScreen = ({ navigation, route }: MapScreenProps) => {
+    const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
+    const [mapRef, setMapRef] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [mapKey, setMapKey] = useState(0);
-    const [hospitals, setHospitals] = useState([]);
-    const [nearbyHospitals, setNearbyHospitals] = useState([]);
+    const [mapKey] = useState(0);
+    const [hospitals, setHospitals] = useState<Hospital[]>([]);
+    const [nearbyHospitals, setNearbyHospitals] = useState<Hospital[]>([]);
     const [hospitalLoading, setHospitalLoading] = useState(true);
-    const [searchCenter, setSearchCenter] = useState(null);
-    const [currentCamera, setCurrentCamera] = useState(null);
+    const [searchCenter, setSearchCenter] = useState<Location | null>(null);
+    const [currentCamera, setCurrentCamera] = useState<Camera | null>(null);
 
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedHospital, setSelectedHospital] = useState(null);
+    const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
 
     const { hospitalType = '모든 병원' } = route?.params || {};
 
@@ -186,7 +228,7 @@ const MapScreen = ({ navigation, route }) => {
                 return;
             }
 
-            let hospitalArray = [];
+            let hospitalArray: any[] = [];
             if (Array.isArray(response)) {
                 hospitalArray = response;
             } else if (response.data && Array.isArray(response.data)) {
@@ -199,7 +241,7 @@ const MapScreen = ({ navigation, route }) => {
 
             console.log(`원본 데이터: ${hospitalArray.length}개`);
 
-            const hospitalData = hospitalArray.map((hospital, index) => {
+            const hospitalData: Hospital[] = hospitalArray.map((hospital: any, index: number) => {
                 const lat = parseFloat(hospital.lat || hospital['좌표(Y)'] || hospital.latitude || 0);
                 const long = parseFloat(hospital.long || hospital['좌표(X)'] || hospital.longitude || 0);
 
@@ -214,7 +256,7 @@ const MapScreen = ({ navigation, route }) => {
                     department: hospital.department || '',
                     type: hospital.type || 'general',
                 };
-            }).filter(hospital => {
+            }).filter((hospital: Hospital) => {
                 const isValid = hospital.latitude !== 0 &&
                     hospital.longitude !== 0 &&
                     !isNaN(hospital.latitude) &&
@@ -236,8 +278,7 @@ const MapScreen = ({ navigation, route }) => {
         }
     }, [hospitalType]);
 
-    // 거리 계산
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
         const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -249,8 +290,7 @@ const MapScreen = ({ navigation, route }) => {
         return R * c;
     };
 
-    // 특정 위치 기준으로 가까운 병원 80개 찾기
-    const findNearbyHospitals = useCallback((centerLat, centerLng) => {
+    const findNearbyHospitals = useCallback((centerLat: number, centerLng: number): Hospital[] => {
         if (hospitals.length === 0) { return []; }
 
         console.log(`병원 검색 시작 - 중심: ${centerLat}, ${centerLng}`);
@@ -282,7 +322,7 @@ const MapScreen = ({ navigation, route }) => {
         fetchHospitals();
     }, [fetchHospitals]);
 
-    const requestLocationPermission = async () => {
+    const requestLocationPermission = async (): Promise<boolean> => {
         if (Platform.OS === 'android') {
             try {
                 const granted = await PermissionsAndroid.request(
@@ -333,11 +373,20 @@ const MapScreen = ({ navigation, route }) => {
         );
     };
 
+    const fallbackToCurrentLocation = useCallback(() => {
+        console.log('폴백: 현재 위치 기준 검색');
+        if (currentLocation) {
+            setSearchCenter(currentLocation);
+            const nearby = findNearbyHospitals(currentLocation.latitude, currentLocation.longitude);
+            setNearbyHospitals(nearby);
+        }
+    }, [currentLocation, findNearbyHospitals]);
+
     const moveToCurrentLocation = () => {
         console.log('📍 아이콘 클릭 - 현재 카메라 중앙 기준 병원 검색');
 
         if (mapRef && mapRef.getCameraPosition) {
-            mapRef.getCameraPosition().then((camera) => {
+            mapRef.getCameraPosition().then((camera: Camera) => {
                 const centerLat = camera.latitude;
                 const centerLng = camera.longitude;
 
@@ -348,7 +397,7 @@ const MapScreen = ({ navigation, route }) => {
                 setNearbyHospitals(nearby);
 
                 console.log(`지도 중앙 기준 병원 ${nearby.length}개 검색 완료`);
-            }).catch((error) => {
+            }).catch((error: any) => {
                 console.error('카메라 위치 가져오기 실패:', error);
                 fallbackToCurrentLocation();
             });
@@ -367,16 +416,7 @@ const MapScreen = ({ navigation, route }) => {
         }
     };
 
-    const fallbackToCurrentLocation = () => {
-        console.log('폴백: 현재 위치 기준 검색');
-        if (currentLocation) {
-            setSearchCenter(currentLocation);
-            const nearby = findNearbyHospitals(currentLocation.latitude, currentLocation.longitude);
-            setNearbyHospitals(nearby);
-        }
-    };
-
-    const handleMapTap = (event) => {
+    const handleMapTap = (event: any) => {
         const { latitude, longitude } = event;
         console.log('지도 클릭:', latitude, longitude);
 
@@ -385,13 +425,13 @@ const MapScreen = ({ navigation, route }) => {
         setNearbyHospitals(nearby);
     };
 
-    const handleHospitalMarkerTap = (hospital) => {
+    const handleHospitalMarkerTap = (hospital: Hospital) => {
         console.log(`${hospital.name} 클릭됨`);
         setSelectedHospital(hospital);
         setModalVisible(true);
     };
 
-    const makePhoneCall = (phoneNumber) => {
+    const makePhoneCall = (phoneNumber: string) => {
         if (!phoneNumber) {
             console.log('전화번호가 없습니다.');
             return;
@@ -465,17 +505,13 @@ const MapScreen = ({ navigation, route }) => {
                         onInitialized={() => {
                             console.log('지도 준비 완료');
                         }}
-                        onCameraChanged={(event) => {
+                        onCameraChanged={(event: any) => {
                             const { latitude, longitude, zoom } = event;
                             const cameraInfo = { latitude, longitude, zoom };
                             setCurrentCamera(cameraInfo);
                         }}
-                        onTap={handleMapTap}
-                        onError={(e) => {
-                            console.error('네이버 지도 error:', e);
-                        }}
+                        onTapMap={handleMapTap}
                     >
-                        {/* 현재 위치 마커 */}
                         <NaverMapMarkerOverlay
                             latitude={currentLocation.latitude}
                             longitude={currentLocation.longitude}
@@ -485,8 +521,7 @@ const MapScreen = ({ navigation, route }) => {
                             }}
                         />
 
-                        {/* 검색 중심점 마커 (현재 위치와 다를 때만 표시) */}
-                        {searchCenter && 
+                        {searchCenter &&
                             (searchCenter.latitude !== currentLocation.latitude ||
                             searchCenter.longitude !== currentLocation.longitude) && (
                             <NaverMapMarkerOverlay
@@ -504,12 +539,10 @@ const MapScreen = ({ navigation, route }) => {
                                     borderRadius: 8,
                                     borderWidth: 2,
                                     borderColor: 'white',
-                                }}>
-                                </View>
+                                }} />
                             </NaverMapMarkerOverlay>
                         )}
 
-                        {/* 병원 마커들 */}
                         {nearbyHospitals.map((hospital) => (
                             <NaverMapMarkerOverlay
                                 key={hospital.id}
@@ -532,8 +565,7 @@ const MapScreen = ({ navigation, route }) => {
                                     shadowOpacity: 0.3,
                                     shadowRadius: 1,
                                     elevation: 2,
-                                }}>
-                                </View>
+                                }} />
                             </NaverMapMarkerOverlay>
                         ))}
                     </NaverMapView>

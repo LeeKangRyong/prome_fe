@@ -3,12 +3,55 @@ import { ScrollView, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
-import LinearGradient from 'react-native-linear-gradient';
+import LinearGradient, { LinearGradientProps } from 'react-native-linear-gradient';
 import { Svg, Line } from 'react-native-svg';
 import Back from '../../common/Back';
 import useFullScreen from '../../hooks/useFullScreen';
 import Fontsizes from '../../styles/fontsizes';
 import { ask } from '../../../models/chat';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface ChatRoomScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+    route: {
+        params?: {
+            diagnosisData?: {
+                content: string;
+                temp: number;
+                ecg: string;
+            };
+        };
+    };
+}
+
+interface TopProps {
+    keyboardVisible: boolean;
+}
+
+interface ChatMessageProps {
+    isUser: boolean;
+}
+
+interface Message {
+    id: number;
+    text: string;
+    isUser: boolean;
+    isRecommend?: boolean;
+    isDiag?: boolean;
+    showDiagButton?: boolean;
+    showMostButton?: boolean;
+    showPeriodButton?: boolean;
+    diagnosisData?: {
+        temp: number;
+        ecg: string;
+    };
+}
+
+interface DiagnosisData {
+    content: string;
+    temp: number;
+    ecg: string;
+}
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -20,7 +63,7 @@ const Container = styled.View`
     background-color: ${Colors.background.bg};
 `;
 
-const Top = styled.View`
+const Top = styled.View<TopProps>`
     height: ${props => props.keyboardVisible ? '10%' : '20%'};
     justify-content: center;
     align-items: center;
@@ -39,7 +82,7 @@ const Gradient = styled(LinearGradient).attrs({
     left: 0;
     right: 0;
     bottom: 0;
-`;
+` as React.ComponentType<Partial<LinearGradientProps>>;
 
 const TopText = styled.Text`
     font-size: ${Fontsizes.mm};
@@ -138,7 +181,7 @@ const WelcomeMessage = styled.Text`
     margin: 20px 0;
 `;
 
-const ChatMessage = styled.View`
+const ChatMessage = styled.View<ChatMessageProps>`
     border: 2px solid ${Colors.primary};
     border-radius: 20px;
     background-color: white;
@@ -253,11 +296,11 @@ const ActionButtonText = styled.Text`
     font-weight: 600;
 `;
 
-const ChatRoomScreen = ({ navigation, route }) => {
+const ChatRoomScreen = ({ navigation, route }: ChatRoomScreenProps) => {
     const { enableFullScreen, disableFullScreen } = useFullScreen();
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentChatId, setCurrentChatId] = useState(null);
+    const [currentChatId, setCurrentChatId] = useState<number | null>(null);
 
     useEffect(() => {
         enableFullScreen();
@@ -275,18 +318,18 @@ const ChatRoomScreen = ({ navigation, route }) => {
         };
     }, [enableFullScreen, disableFullScreen]);
 
-    const [messages, setMessages] = useState([
+    const [messages, setMessages] = useState<Message[]>([
         { id: 1, text: '안녕하세요, 콩콩봇입니다', isUser: false },
         { id: 2, text: '문의하실 내용을 간단히 입력하시거나, 아래 버튼을 선택해주세요', isUser: false },
     ]);
     const [inputText, setInputText] = useState('');
-    const scrollViewRef = useRef(null);
+    const scrollViewRef = useRef<ScrollView>(null);
 
     useEffect(() => {
         if (route.params?.diagnosisData) {
             const { diagnosisData } = route.params;
 
-            const diagnosisMessage = {
+            const diagnosisMessage: Message = {
                 id: messages.length + 1,
                 text: diagnosisData.content,
                 isUser: true,
@@ -299,26 +342,23 @@ const ChatRoomScreen = ({ navigation, route }) => {
             setMessages(prev => [...prev, diagnosisMessage]);
 
             handleDiagnosisRequest(diagnosisData);
-            navigation.setParams({ diagnosisData: null });
+            navigation.setParams({ diagnosisData: undefined });
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route.params?.diagnosisData]);
 
-    const handleDiagnosisRequest = async (diagnosisData) => {
+    const handleDiagnosisRequest = async (diagnosisData: DiagnosisData) => {
         setIsLoading(true);
 
         try {
-            const response = await ask(diagnosisData.content, currentChatId, {
-                temperature: diagnosisData.temp,
-                ecgResult: diagnosisData.ecg,
-            });
+            const response = await ask(diagnosisData.content, currentChatId ?? null);
 
             if (response.success && response.chat) {
                 if (!currentChatId && response.chat.chat_id) {
                     setCurrentChatId(response.chat.chat_id);
                 }
 
-                const botResponse = {
+                const botResponse: Message = {
                     id: messages.length + 2,
                     text: response.chat.answer.content,
                     isUser: false,
@@ -336,7 +376,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
             }
         } catch (error) {
             console.error('진단 요청 오류:', error);
-            const errorMessage = {
+            const errorMessage: Message = {
                 id: messages.length + 2,
                 text: '진단 처리 중 오류가 발생했습니다. 다시 시도해 주세요.',
                 isUser: false,
@@ -350,7 +390,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
     const sendMessage = async () => {
         if (inputText.trim() && !isLoading) {
             setIsLoading(true);
-            const newMessage = {
+            const newMessage: Message = {
                 id: messages.length + 1,
                 text: inputText,
                 isUser: true,
@@ -365,14 +405,14 @@ const ChatRoomScreen = ({ navigation, route }) => {
             }, 100);
 
             try {
-                const response = await ask(currentInput, currentChatId);
+                const response = await ask(currentInput, currentChatId ?? null);
 
                 if (response.success && response.chat) {
                     if (!currentChatId && response.chat.chat_id) {
                         setCurrentChatId(response.chat.chat_id);
                     }
 
-                    const botResponse = {
+                    const botResponse: Message = {
                         id: messages.length + 2,
                         text: response.chat.answer.content,
                         isUser: false,
@@ -391,7 +431,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
             } catch (error) {
                 console.error('메시지 전송 에러:', error);
 
-                const errorResponse = {
+                const errorResponse: Message = {
                     id: messages.length + 2,
                     text: '죄송합니다. 일시적인 오류가 발생했습니다. 다시 시도해주세요.',
                     isUser: false,
@@ -410,10 +450,10 @@ const ChatRoomScreen = ({ navigation, route }) => {
         }
     };
 
-    const handleQuickSelect = async (text) => {
+    const handleQuickSelect = async (text: string) => {
         if (isLoading) { return; }
 
-        const newMessage = {
+        const newMessage: Message = {
             id: messages.length + 1,
             text: text,
             isUser: true,
@@ -427,7 +467,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
 
         if (text === '심전도 검사') {
             setTimeout(() => {
-                const diagMessage = {
+                const diagMessage: Message = {
                     id: messages.length + 2,
                     text: '심전도 검사를 원하시나요?',
                     isUser: false,
@@ -440,7 +480,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
             }, 1000);
         } else if (text === '심전도 검사 관련 질문') {
             setTimeout(() => {
-                const mostMessage = {
+                const mostMessage: Message = {
                     id: messages.length + 2,
                     text: '가장 많이 한 질문을 봐보세요!',
                     isUser: false,
@@ -453,7 +493,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
             }, 1000);
         } else if (text === '기록 보기') {
             setTimeout(() => {
-                const periodMessage = {
+                const periodMessage: Message = {
                     id: messages.length + 2,
                     text: '이전 기록을 확인해보세요!',
                     isUser: false,
@@ -467,14 +507,14 @@ const ChatRoomScreen = ({ navigation, route }) => {
         } else {
             try {
                 setIsLoading(true);
-                const response = await ask(text, currentChatId);
+                const response = await ask(text, currentChatId ?? null);
 
                 if (response.success && response.chat) {
                     if (!currentChatId && response.chat.chat_id) {
                         setCurrentChatId(response.chat.chat_id);
                     }
 
-                    const botResponse = {
+                    const botResponse: Message = {
                         id: messages.length + 2,
                         text: response.chat.answer.content,
                         isUser: false,
@@ -490,7 +530,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
                 }
             } catch (error) {
                 console.error('퀵 셀렉트 에러:', error);
-                const errorResponse = {
+                const errorResponse: Message = {
                     id: messages.length + 2,
                     text: `${text}에 대해 도움을 드리겠습니다. 다시 시도해주세요.`,
                     isUser: false,
@@ -545,7 +585,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+                    keyboardVerticalOffset={0}
                 >
                     <ChatScrollView
                         showsVerticalScrollIndicator={false}
@@ -593,7 +633,6 @@ const ChatRoomScreen = ({ navigation, route }) => {
                                         </ActionButton>
                                     </ActionMessage>
                                 ) : message.isRecommend && !message.isUser ? (
-                                    // isRecommend가 true일 때 병원 찾기 버튼 표시
                                     <ActionMessage>
                                         <ChatText>{message.text}</ChatText>
                                         <ActionButton onPress={() => navigation.navigate('Map')}>
@@ -601,7 +640,6 @@ const ChatRoomScreen = ({ navigation, route }) => {
                                         </ActionButton>
                                     </ActionMessage>
                                 ) : message.isDiag && !message.isUser ? (
-                                    // isDiag가 true일 때 심전도 검사 버튼 표시
                                     <ActionMessage>
                                         <ChatText>{message.text}</ChatText>
                                         <ActionButton onPress={() => navigation.navigate('Diag')}>

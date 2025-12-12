@@ -1,10 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image, TouchableOpacity, Animated } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppState } from '../../../App';
 import Colors from '../../styles/Colors';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface NextScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+}
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -88,7 +93,7 @@ const Bold = styled.Text`
     font-weight: 600;
 `;
 
-const NextScreen = ({ navigation }) => {
+const NextScreen = ({ navigation }: NextScreenProps) => {
     const titleOpacity = useState(new Animated.Value(0))[0];
     const descOpacity = useState(new Animated.Value(0))[0];
     const buttonOpacity = useState(new Animated.Value(0))[0];

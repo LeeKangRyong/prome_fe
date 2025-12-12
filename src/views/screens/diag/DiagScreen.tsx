@@ -3,12 +3,31 @@ import { ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Image, Ke
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
-import LinearGradient from 'react-native-linear-gradient';
+import LinearGradient, { LinearGradientProps } from 'react-native-linear-gradient';
 import Back from '../../common/Back';
 import useFullScreen from '../../hooks/useFullScreen';
 import useModal from '../../hooks/useModal';
 import DiagResultScreen from './DiagResultScreen';
 import Fontsizes from '../../styles/fontsizes';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface DiagScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+}
+
+interface TopProps {
+    keyboardVisible: boolean;
+}
+
+interface ChatMessageProps {
+    isUser: boolean;
+}
+
+interface Message {
+    id: number;
+    text: string;
+    isUser: boolean;
+}
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -20,7 +39,7 @@ const Container = styled.View`
     background-color: ${Colors.background.bg};
 `;
 
-const Top = styled.View`
+const Top = styled.View<TopProps>`
     height: ${props => props.keyboardVisible ? '10%' : '20%'};
     justify-content: center;
     align-items: center;
@@ -40,7 +59,7 @@ const Gradient = styled(LinearGradient).attrs({
     left: 0;
     right: 0;
     bottom: 0;
-`;
+` as React.ComponentType<Partial<LinearGradientProps>>;
 
 const TopText = styled.Text`
     font-size: ${Fontsizes.mm};
@@ -85,7 +104,7 @@ const WelcomeMessage = styled.Text`
     margin: 20px 0;
 `;
 
-const ChatMessage = styled.View`
+const ChatMessage = styled.View<ChatMessageProps>`
     border: 2px solid ${Colors.primary};
     border-radius: 20px;
     background-color: white;
@@ -96,9 +115,8 @@ const ChatMessage = styled.View`
     shadow-opacity: 0.1;
     shadow-radius: 4px;
     elevation: 3;
-    align-self: ${props => props.isUser ? 'flex-end' : 'flex-start'};
+    align-self: ${props => props.isUser ? 'flex-end' : 'center'};
     width: 95%;
-    align-self: center;
 `;
 
 const ChatText = styled.Text`
@@ -113,7 +131,7 @@ const Bold = styled.Text`
 
 const BottomSection = styled.View`
     position: absolute;
-    bottom: -20;
+    bottom: -20px;
     left: 0;
     right: 0;
     padding: 30px;
@@ -176,10 +194,20 @@ const ModalContent = styled.View`
     flex: 1;
 `;
 
-const DiagScreen = ({ navigation }) => {
+const DiagScreen = ({ navigation }: DiagScreenProps) => {
     const { enableFullScreen, disableFullScreen } = useFullScreen();
     const { isModalVisible, openModal, closeModal } = useModal();
     const [keyboardVisible, setKeyboardVisible] = useState(false);
+    const [messages] = useState<Message[]>([]);
+    const scrollViewRef = useRef<ScrollView>(null);
+
+    const [frequentQuestions] = useState([
+        '양쪽 팔꿈치 안쪽에 전극패치를 부착해주세요',
+        '오른쪽 복숭아 뼈 안쪽 아래에 부착해주세요',
+        '양 팔을 다리 위에 올린 뒤 편하게 기다려 주세요',
+        '측정 시작하기를 눌러주세요',
+        '검사가 완료되면 결과를 확인해 주세요',
+    ]);
 
     useEffect(() => {
         enableFullScreen();
@@ -197,18 +225,6 @@ const DiagScreen = ({ navigation }) => {
         };
     }, [enableFullScreen, disableFullScreen]);
 
-    const [messages, setMessages] = useState([]);
-
-    const [frequentQuestions] = useState([
-        '양쪽 팔꿈치 안쪽에 전극패치를 부착해주세요',
-        '오른쪽 복숭아 뼈 안쪽 아래에 부착해주세요',
-        '양 팔을 다리 위에 올린 뒤 편하게 기다려 주세요',
-        '측정 시작하기를 눌러주세요',
-        '검사가 완료되면 결과를 확인해 주세요',
-    ]);
-
-    const scrollViewRef = useRef(null);
-
     const handleDiagButtonPress = () => {
         openModal();
     };
@@ -225,7 +241,7 @@ const DiagScreen = ({ navigation }) => {
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+                    keyboardVerticalOffset={0}
                 >
                     <ChatScrollView
                         showsVerticalScrollIndicator={false}

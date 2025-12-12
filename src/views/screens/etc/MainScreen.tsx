@@ -6,6 +6,19 @@ import Colors from '../../styles/Colors';
 import TabBar from '../../common/TabBar';
 import Hospital from '../../components/etc/Hospital';
 import History from '../../components/etc/History';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface MainScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+}
+
+interface SelectProps {
+    selected: boolean;
+}
+
+interface SelectTextProps {
+    selected: boolean;
+}
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -61,15 +74,16 @@ const QuestionLeft = styled(TouchableOpacity)`
 
 const QuestionTextWrapper = styled.View`
     flex-direction: row;
-    top: 10%;
-    left: 10%;
+    align-items: center;
+    justify-content: center;
+    bottom: 10%;
 `;
 
 const QuestionLeftText = styled.Text`
     font-size: 18px;
     font-weight: 600;
     text-align: center;
-    color: black;  
+    color: black;
 `;
 
 const QuestionLeftTextSmile = styled(Image)`
@@ -99,18 +113,17 @@ const QuestionIcon = styled(Image)`
 
 const KongDot = styled(Image)`
     position: absolute;
-    bottom: 5;
-    right: -20;
+    bottom: 5px;
+    right: -20px;
 `;
 
 const KongVector = styled(Image)`
-    position: absoulte;
-    left: 65;
-    bottom: -40;
+    position: absolute;
+    left: 65px;
+    bottom: -40px;
     width: 40px;
     resize-mode: contain;
 `;
-
 
 const KongReverseWrapper = styled.View`
     border-radius: 24px;
@@ -140,8 +153,8 @@ const QuestionRightText = styled.Text`
     position: absolute;
     font-size: 14px;
     color: black;
-    bottom: 7;
-    right: 10;
+    bottom: 7px;
+    right: 10px;
 `;
 
 const Red = styled.Text`
@@ -160,7 +173,7 @@ const Wrap = styled.View`
     padding: 5px;
 `;
 
-const Select = styled(TouchableOpacity)`
+const Select = styled(TouchableOpacity)<SelectProps>`
     border-radius: 12px;
     background-color: ${props => props.selected ? Colors.primary : 'white'};
     border: 1px solid ${props => props.selected ? Colors.primary : '#BCBCBC'};
@@ -169,13 +182,13 @@ const Select = styled(TouchableOpacity)`
     align-items: center;
 `;
 
-const SelectText = styled.Text`
+const SelectText = styled.Text<SelectTextProps>`
     font-size: 14px;
     color: ${props => props.selected ? 'white' : '#BCBCBC'};
     text-align: center;
 `;
 
-const MainScreen = ({ navigation }) => {
+const MainScreen = ({ navigation }: MainScreenProps) => {
     const [selectedTab, setSelectedTab] = useState('이전기록');
 
     const handleDiag = () => {
@@ -206,34 +219,34 @@ const MainScreen = ({ navigation }) => {
         <SafeView>
             <Container>
                 <Top onPress={() => handleDiag()}>
-                    <TopText style={{  top: 10, left: 10 }}>이런 심전도 검사는 어때요?</TopText>
-                    <TopText style={{  top: 80, right: 10 }}>심전도 검사 하러가기 !!</TopText>
+                    <TopText style={{ top: 10, left: 10 }}>이런 심전도 검사는 어때요?</TopText>
+                    <TopText style={{ top: 80, right: 10 }}>심전도 검사 하러가기 !!</TopText>
                 </Top>
                 <ExpText>AI 챗봇에게 질문해보세요!</ExpText>
                 <QuestionWrapper>
                     <QuestionLeft onPress={() => navigation.navigate('Chat')}>
                         <QuestionTextWrapper>
                             <QuestionLeftText>즉시 답해드려요</QuestionLeftText>
-                            <QuestionLeftTextSmile source={require('../../../assets/smile.png')} alt="스마일" />
+                            <QuestionLeftTextSmile source={require('../../../assets/smile.png')} />
                         </QuestionTextWrapper>
-                        <KongDot source={require('../../../assets/kong_dot.png')} alt="점선콩" />
-                        <KongVector source={require('../../../assets/vector_left.png')} alt="콩벡터" />
+                        <KongDot source={require('../../../assets/kong_dot.png')} />
+                        <KongVector source={require('../../../assets/vector_left.png')} />
                         <Red style={{ position: 'absolute', bottom: 4, left: 20, fontSize: 12 }}>with 콩콩봇</Red>
                     </QuestionLeft>
                     <QuestionRightWrapper>
-                        <QuestionRight1 onPress={() => navigation.navigate('ChatMost') }>
-                            <QuestionIcon source={require('../../../assets/question.png')} alt="물음표"/>
-                            <QuestionIcon style={{ bottom: 10, left: 18 }} source={require('../../../assets/eclip.png')} alt="그림자"/>
-                            <QuestionIcon style={{ width: 24, height: 24, left: 40, transform: [{ rotate: '45deg' }] }} source={require('../../../assets/question.png')} alt="물음표"/>
-                            <QuestionIcon style={{ bottom: 20, left: 38 }} source={require('../../../assets/eclip.png')} alt="그림자"/>
-                            <QuestionIcon style={{ width: 30, height: 30, top: 10, right: 10, transform: [{ rotate: '45deg' }], opacity: 0.64 }} source={require('../../../assets/question.png')} alt="물음표"/>
-                            <QuestionIcon style={{ top: 42, right: 20, opacity: 0.64 }} source={require('../../../assets/eclip.png')} alt="그림자"/>
+                        <QuestionRight1 onPress={() => navigation.navigate('ChatMost')}>
+                            <QuestionIcon source={require('../../../assets/question.png')} />
+                            <QuestionIcon style={{ bottom: 10, left: 18 }} source={require('../../../assets/eclip.png')} />
+                            <QuestionIcon style={{ width: 24, height: 24, left: 40, transform: [{ rotate: '45deg' }] }} source={require('../../../assets/question.png')} />
+                            <QuestionIcon style={{ bottom: 20, left: 38 }} source={require('../../../assets/eclip.png')} />
+                            <QuestionIcon style={{ width: 30, height: 30, top: 10, right: 10, transform: [{ rotate: '45deg' }], opacity: 0.64 }} source={require('../../../assets/question.png')} />
+                            <QuestionIcon style={{ top: 42, right: 20, opacity: 0.64 }} source={require('../../../assets/eclip.png')} />
                             <QuestionRightText>가장 많이 한 질문</QuestionRightText>
                         </QuestionRight1>
                         <QuestionRight2>
-                            <QuestionRightText><Red style={{ fontWeight: 600 }}>콩콩봇이란 ?</Red></QuestionRightText>
+                            <QuestionRightText><Red style={{ fontWeight: '600' }}>콩콩봇이란 ?</Red></QuestionRightText>
                             <KongReverseWrapper>
-                                <KongReverse source={require('../../../assets/kong_reverse.png')} alt="콩리버스" />
+                                <KongReverse source={require('../../../assets/kong_reverse.png')} />
                             </KongReverseWrapper>
                         </QuestionRight2>
                     </QuestionRightWrapper>
@@ -259,7 +272,6 @@ const MainScreen = ({ navigation }) => {
             </Container>
         </SafeView>
     );
-
-
 };
+
 export default MainScreen;

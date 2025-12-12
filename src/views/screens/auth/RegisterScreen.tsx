@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
 import Back from '../../common/Back';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
+import LinearGradient, { LinearGradientProps } from 'react-native-linear-gradient';
 import { TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Keyboard, Alert } from 'react-native';
 import useFullScreen from '../../hooks/useFullScreen';
 import { register } from '../../../models/auth';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface RegisterScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+}
+
+interface TopProps {
+    keyboardVisible: boolean;
+}
+
+interface GenderProps {
+    selected: boolean;
+}
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -18,7 +31,7 @@ const Container = styled.View`
     flex: 1;
 `;
 
-const Top = styled.View`
+const Top = styled.View<TopProps>`
     height: ${props => props.keyboardVisible ? '10%' : '15%'};
     justify-content: center;
     align-items: center;
@@ -36,7 +49,7 @@ const Gradient = styled(LinearGradient).attrs({
     left: 0;
     right: 0;
     bottom: 0;
-`;
+`as React.ComponentType<Partial<LinearGradientProps>>;
 
 const Title = styled.Text`
     font-size: 28px;
@@ -106,7 +119,7 @@ const GenderContainer = styled.View`
     gap: 12px;
 `;
 
-const GenderButton = styled(TouchableOpacity)`
+const GenderButton = styled(TouchableOpacity)<GenderProps>`
     flex: 1;
     height: 50px;
     border: 1px solid ${Colors.primary};
@@ -116,7 +129,7 @@ const GenderButton = styled(TouchableOpacity)`
     background-color: ${props => props.selected ? '#DEF3FB' : 'white'};
 `;
 
-const GenderText = styled.Text`
+const GenderText = styled.Text<GenderProps>`
     font-size: 16px;
     font-weight: 500;
     color: black;
@@ -143,7 +156,7 @@ const Bold = styled.Text`
     font-weight: 700;
 `;
 
-const RegisterScreen = ({ navigation }) => {
+const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const [selectedGender, setSelectedGender] = useState('');
     const [name, setName] = useState('');
     const [age, setAge] = useState('');

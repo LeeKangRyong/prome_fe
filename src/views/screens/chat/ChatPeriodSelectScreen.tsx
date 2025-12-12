@@ -3,9 +3,29 @@ import { TouchableOpacity, Image, ScrollView, TextInput, Alert } from 'react-nat
 import styled from 'styled-components/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '../../styles/Colors';
-import LinearGradient from 'react-native-linear-gradient';
+import LinearGradient, { LinearGradientProps } from 'react-native-linear-gradient';
 import Svg, { Line } from 'react-native-svg';
 import { getChat7Period, getChat30Period, getChatByPeriod } from '../../../models/chat';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface ChatPeriodSelectScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+    route: {
+        params?: {
+            selectedPeriod?: number;
+        };
+    };
+}
+
+interface ActiveProps {
+    active: boolean;
+}
+
+interface ChatItem {
+    chat_id: number;
+    title: string;
+    created_at: string;
+}
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -46,7 +66,7 @@ const BackgroundGradient = styled(LinearGradient).attrs({
     left: 0;
     right: 0;
     bottom: 0;
-`;
+` as React.ComponentType<Partial<LinearGradientProps>>;
 
 const BackgroundTopText = styled.Text`
     font-size: 16px;
@@ -279,13 +299,13 @@ const PeriodSelector = styled.View`
     elevation: 1;
 `;
 
-const PeriodButton = styled(TouchableOpacity)`
+const PeriodButton = styled(TouchableOpacity)<ActiveProps>`
     padding: 8px 12px;
     border-radius: 15px;
     background-color: ${props => props.active ? (Colors.primary || '#4CAF50') : '#f0f0f0'};
 `;
 
-const PeriodButtonText = styled.Text`
+const PeriodButtonText = styled.Text<ActiveProps>`
     color: ${props => props.active ? 'white' : '#666'};
     font-weight: ${props => props.active ? '600' : '400'};
     font-size: 12px;
@@ -303,7 +323,7 @@ const BottomTabContainer = styled.View`
     border-bottom-right-radius: 30px;
 `;
 
-const TabButton = styled(TouchableOpacity)`
+const TabButton = styled(TouchableOpacity)<ActiveProps>`
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -314,16 +334,16 @@ const TabButton = styled(TouchableOpacity)`
     margin-right: 15px;
 `;
 
-const TabIcon = styled(Image)`
+const TabIcon = styled(Image)<ActiveProps>`
     resize-mode: contain;
     tint-color: ${props => props.active ? 'white' : (Colors.primary || '#4CAF50')};
 `;
 
-const ChatPeriodSelectScreen = ({ navigation, route }) => {
+const ChatPeriodSelectScreen = ({ navigation, route }: ChatPeriodSelectScreenProps) => {
     const [searchText, setSearchText] = useState('');
-    const [chatHistory, setChatHistory] = useState([]);
+    const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
     const [loading, setLoading] = useState(false);
-    const [filteredHistory, setFilteredHistory] = useState([]);
+    const [filteredHistory, setFilteredHistory] = useState<ChatItem[]>([]);
     const [selectedPeriod, setSelectedPeriod] = useState(7);
 
     useEffect(() => {
@@ -381,7 +401,7 @@ const ChatPeriodSelectScreen = ({ navigation, route }) => {
         }
     }, [searchText, chatHistory]);
 
-    const handleChatPress = (chatId, title) => {
+    const handleChatPress = (chatId: number, title: string) => {
         navigation.navigate('ChatHistory', {
             chatId: chatId,
             chatTitle: title,
@@ -392,12 +412,12 @@ const ChatPeriodSelectScreen = ({ navigation, route }) => {
         navigation.goBack();
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         return `${date.getMonth() + 1}.${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
     };
 
-    const renderChatItem = (chat) => (
+    const renderChatItem = (chat: ChatItem) => (
         <ChatItem
             key={chat.chat_id}
             onPress={() => handleChatPress(chat.chat_id, chat.title)}

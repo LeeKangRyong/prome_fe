@@ -1,14 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ScrollView, TouchableOpacity, Image } from 'react-native';
+import { ScrollView, Image } from 'react-native';
 import styled from 'styled-components/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '../../styles/Colors';
-import LinearGradient from 'react-native-linear-gradient';
+import LinearGradient, { LinearGradientProps } from 'react-native-linear-gradient';
 import Svg, { Line } from 'react-native-svg';
 import Back from '../../common/Back';
 import useFullScreen from '../../hooks/useFullScreen';
 import Fontsizes from '../../styles/fontsizes';
 import { getChat } from '../../../models/chat';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface ChatRoomHistoryScreenProps {
+    navigation: NativeStackNavigationProp<any>;
+    route: {
+        params?: {
+            chatId?: number;
+            chatTitle?: string;
+        };
+    };
+}
+
+interface ChatMessageProps {
+    isUser: boolean;
+}
+
+interface Message {
+    id: number;
+    text: string;
+    isUser: boolean;
+    isRecommend: boolean;
+    isDiag: boolean;
+    created_at: string;
+}
+
+interface Comment {
+    content: string;
+    is_question: boolean;
+    is_recommend: boolean;
+    is_diag: boolean;
+    created_at: string;
+}
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -39,7 +71,7 @@ const Gradient = styled(LinearGradient).attrs({
     left: 0;
     right: 0;
     bottom: 0;
-`;
+` as React.ComponentType<Partial<LinearGradientProps>>;
 
 const TopText = styled.Text`
     font-size: ${Fontsizes.mm};
@@ -108,7 +140,7 @@ const KongText = styled.Text`
     margin-right: 10px;
 `;
 
-const ChatMessage = styled.View`
+const ChatMessage = styled.View<ChatMessageProps>`
     border: 2px solid ${Colors.primary};
     border-radius: 20px;
     background-color: white;
@@ -143,13 +175,13 @@ const ErrorText = styled.Text`
     font-size: 16px;
 `;
 
-const ChatRoomHistoryScreen = ({ navigation, route }) => {
+const ChatRoomHistoryScreen = ({ navigation, route }: ChatRoomHistoryScreenProps) => {
     const { enableFullScreen, disableFullScreen } = useFullScreen();
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const [chatTitle, setChatTitle] = useState('채팅 기록');
-    const scrollViewRef = useRef(null);
+    const scrollViewRef = useRef<ScrollView>(null);
 
     const chatId = route?.params?.chatId;
     const passedTitle = route?.params?.chatTitle;
@@ -163,6 +195,11 @@ const ChatRoomHistoryScreen = ({ navigation, route }) => {
     }, [enableFullScreen, disableFullScreen]);
 
     const loadChatHistory = React.useCallback(async () => {
+        if (!chatId) {
+            setError('채팅방 ID가 없습니다.');
+            setLoading(false);
+            return;
+        }
         try {
             setLoading(true);
             setError(null);
@@ -171,7 +208,7 @@ const ChatRoomHistoryScreen = ({ navigation, route }) => {
 
             if (response && response.success && response.data) {
 
-                const loadedMessages = response.data.history.map((comment, index) => ({
+                const loadedMessages = response.data.history.map((comment: Comment, index: number) => ({
                     id: index + 1,
                     text: comment.content,
                     isUser: comment.is_question,
