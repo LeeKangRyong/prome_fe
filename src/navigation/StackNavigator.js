@@ -13,12 +13,8 @@ import ChatRoomHistoryScreen from '../views/screens/chat/ChatRoomHistoryScreen';
 import DiagScreen from '../views/screens/diag/DiagScreen';
 import DiagResultHistoryScreen from '../views/screens/diag/DiagResultHistoryScreen';
 
-import DescriptionScreen from '../views/screens/etc/DescriptionScreen';
 import MainScreen from '../views/screens/etc/MainScreen';
 import MapScreen from '../views/screens/etc/MapScreen';
-
-import CalendarScreen from '../views/screens/calendar/CalendarScreen';
-import CallScreen from '../views/screens/hospital/CallScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,10 +53,6 @@ const StackNavigator = () => {
                 component={DiagResultHistoryScreen}
                 options={{ headerShown: false, animation: 'none'}}
             />
-            <Stack.Screen name="Description"
-                component={DescriptionScreen}
-                options={{ headerShown: false, animation: 'none'}}
-            />
             <Stack.Screen name="Main"
                 component={MainScreen}
                 options={{ headerShown: false, animation: 'none'}}
@@ -68,14 +60,6 @@ const StackNavigator = () => {
             <Stack.Screen name="Map"
                 component={MapScreen}
                 options={{ headerShown: false, animation: 'none'}}
-            />
-            <Stack.Screen name="Calendar"
-                component={CalendarScreen}
-                options={{ headerShown: false, animation: 'none'}}
-            />
-            <Stack.Screen name="Call"
-                component={CallScreen}
-                options={{ headerShown: false, animation: 'none' }}
             />
             <Stack.Screen name="Next"
                 component={NextScreen}
