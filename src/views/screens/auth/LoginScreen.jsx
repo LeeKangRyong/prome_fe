@@ -118,6 +118,13 @@ const SignUpLinkText = styled.Text`
     font-weight: 600;
 `;
 
+const TestBlock = styled.View`
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+`;
+
 const LoginScreen = ({ navigation }) => {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
@@ -240,6 +247,10 @@ const LoginScreen = ({ navigation }) => {
                                 <SignUpLinkText>회원가입</SignUpLinkText>
                             </SignUpLink>
                         </SignUpContainer>
+                        <TestBlock>
+                            <InputLabel>테스트 접속 ID : test1</InputLabel>
+                            <InputLabel>테스트 접속 PW : 1234</InputLabel>
+                        </TestBlock>
                     </FormContainer>
                 </KeyboardAvoidingView>
             </Container>
