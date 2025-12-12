@@ -3,6 +3,38 @@ import { TouchableOpacity, Image, Alert } from 'react-native';
 import styled from 'styled-components/native';
 import Colors from '../styles/Colors';
 import { logout } from '../../models/auth';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface TabBarProps {
+    navigation: NativeStackNavigationProp<any>;
+    currentScreen?: string;
+}
+
+interface TabItem {
+    name: 'Profile' | 'Home' | 'Menu';
+    label: string;
+    icon: number;
+    screen?: string;
+    action?: 'logout';
+}
+
+interface TabButtonProps {
+    isHome?: boolean;
+}
+
+interface TabIconProps {
+    isHome?: boolean;
+    isActive?: boolean;
+}
+
+interface TabIconImageProps {
+    isHome?: boolean;
+    isActive?: boolean;
+}
+
+interface TabLabelProps {
+    isActive?: boolean;
+}
 
 const TabBarWrapper = styled.View`
     position: absolute;
@@ -24,7 +56,7 @@ const TabBarWrapper = styled.View`
     elevation: 5;
 `;
 
-const TabButton = styled(TouchableOpacity)`
+const TabButton = styled(TouchableOpacity)<TabButtonProps>`
     flex: 1;
     justify-content: ${props => props.isHome ? 'flex-start' : 'center'};
     align-items: center;
@@ -32,7 +64,7 @@ const TabButton = styled(TouchableOpacity)`
     padding-top: ${props => props.isHome ? '0px' : '20px'};
 `;
 
-const TabIcon = styled.View`
+const TabIcon = styled.View<TabIconProps>`
     width: ${props => props.isHome ? '56px' : '40px'};
     height: ${props => props.isHome ? '56px' : '40px'};
     border-radius: ${props => props.isHome ? '56px' : '40px'};
@@ -45,19 +77,19 @@ const TabIcon = styled.View`
     background-color: white;
 `;
 
-const TabIconImage = styled(Image)`
+const TabIconImage = styled(Image)<TabIconImageProps>`
     width: ${props => props.isHome ? '40px' : '24px'};
     height: ${props => props.isHome ? '40px' : '24px'};
     resize-mode: contain;
     tint-color: ${props => props.isActive ? 'white' : `${Colors.primary}`};
 `;
 
-const TabLabel = styled.Text`
+const TabLabel = styled.Text<TabLabelProps>`
     font-size: 16px;
     color: ${Colors.primary};
 `;
 
-const TabBar = ({ navigation, currentScreen = 'Home' }) => {
+const TabBar = ({ navigation, currentScreen = 'Home' }: TabBarProps) => {
     const handleLogout = () => {
         Alert.alert(
             "로그아웃",
@@ -65,7 +97,7 @@ const TabBar = ({ navigation, currentScreen = 'Home' }) => {
             [
                 {
                     text: "취소",
-                    style: "cancel"
+                    style: "cancel",
                 },
                 {
                     text: "로그아웃",
@@ -79,18 +111,18 @@ const TabBar = ({ navigation, currentScreen = 'Home' }) => {
                             // 로그아웃 실패해도 로그인 화면으로 이동 (토큰은 이미 클리어됨)
                             navigation.navigate('Login');
                         }
-                    }
-                }
+                    },
+                },
             ]
         );
     };
 
-    const tabs = [
+    const tabs: TabItem[] = [
         {
             name: 'Profile',
             label: '',
             icon: require('../../assets/profile.png'),
-            action: 'logout', // 특별한 액션 표시
+            action: 'logout',
         },
         {
             name: 'Home',
@@ -106,7 +138,7 @@ const TabBar = ({ navigation, currentScreen = 'Home' }) => {
         },
     ];
 
-    const handleTabPress = (tab) => {
+    const handleTabPress = (tab: TabItem) => {
         if (tab.action === 'logout') {
             handleLogout();
         } else if (tab.screen && tab.screen !== currentScreen) {

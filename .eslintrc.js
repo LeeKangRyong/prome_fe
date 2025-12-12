@@ -3,6 +3,7 @@ module.exports = {
   extends: '@react-native',
   rules: {
     'react-native/no-inline-styles': 'off',
+    "quotes": "off",
   },
 
 };

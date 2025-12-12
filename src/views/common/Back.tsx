@@ -1,5 +1,10 @@
 import styled from 'styled-components/native';
 import { Image, TouchableOpacity } from 'react-native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface BackProps {
+    navigation: NativeStackNavigationProp<any>;
+}
 
 const BackImg = styled(Image)`
     width: 100%;
@@ -17,7 +22,7 @@ const BackButton = styled(TouchableOpacity)`
     align-items: center;
 `;
 
-function Back({ navigation }) {
+function Back({ navigation }: BackProps) {
     return (
         <BackButton onPress={() => navigation.pop()}>
             <BackImg source={require('../../assets/back.png')} />

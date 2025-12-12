@@ -1,7 +1,11 @@
 import React from 'react';
 import styled from 'styled-components/native';
 
-const ChatWrapper = styled.View`
+interface ChatProps {
+    isQuestion: boolean;
+}
+
+const ChatWrapper = styled.View<ChatProps>`
     flex-direction: ${props => props.isQuestion ? 'row' : 'row-reverse'};
     width: 80%;
     align-self: center;
@@ -9,7 +13,7 @@ const ChatWrapper = styled.View`
     margin: 5%;
 `;
 
-const ChatUser = styled.View`
+const ChatUser = styled.View<ChatProps>`
     border-radius: 900px;
     width: 15%;
     aspect-ratio: 1;
@@ -37,14 +41,14 @@ const ChatText = styled.Text`
     text-align: center;
 `;
 
-function Chat({ isQuestion }) {
+function Chat({ isQuestion }: ChatProps) {
     return (
         <ChatWrapper isQuestion={isQuestion}>
             <ChatUser isQuestion={isQuestion}>
                 <ChatUserName>{isQuestion ? '나' : 'AI'}</ChatUserName>
             </ChatUser>
             <ChatComment>
-                <ChatText isQuestion={isQuestion}>
+                <ChatText>
                     {isQuestion ? '나 건강해?' : '아니'}
                 </ChatText>
             </ChatComment>

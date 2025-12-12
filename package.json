@@ -44,6 +44,7 @@
     "@react-native/typescript-config": "0.79.2",
     "@types/jest": "^29.5.13",
     "@types/react": "^19.0.0",
+    "@types/react-native-linear-gradient": "^2.3.1",
     "@types/react-test-renderer": "^19.0.0",
     "@types/styled-components-react-native": "^5.2.5",
     "babel-plugin-styled-components": "^2.1.4",

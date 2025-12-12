@@ -1,6 +1,11 @@
 import { TouchableOpacity, Image } from 'react-native';
-import styled from 'styled-components';
-import LinearGradient from 'react-native-linear-gradient';
+import styled from 'styled-components/native';
+import LinearGradient, { LinearGradientProps } from 'react-native-linear-gradient';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface HospitalProps {
+    navigation: NativeStackNavigationProp<any>;
+}
 
 const FindHospitalWrapper = styled.View`
     flex: 1;
@@ -24,14 +29,14 @@ const FindHospitalGradient = styled(LinearGradient).attrs({
 })`
     flex: 1;
     justify-content: center;
-`;
+`as React.ComponentType<Partial<LinearGradientProps>>;
 
 const MapImg = styled(Image)`
     align-self: center;
 `;
 
-function Hospital({ navigation }) {
-    const handleHospitalSearch = (hospitalType) => {
+function Hospital({ navigation }: HospitalProps) {
+    const handleHospitalSearch = (hospitalType: string) => {
         navigation.navigate('Map', { hospitalType });
     };
 

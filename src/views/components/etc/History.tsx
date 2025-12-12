@@ -1,6 +1,11 @@
 import { TouchableOpacity, Image } from 'react-native';
-import styled from 'styled-components';
-import LinearGradient from 'react-native-linear-gradient';
+import styled from 'styled-components/native';
+import LinearGradient, { LinearGradientProps } from 'react-native-linear-gradient';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+interface HistoryProps {
+    navigation: NativeStackNavigationProp<any>;
+}
 
 const HistoryWrapper = styled.View`
     flex: 1;
@@ -24,12 +29,12 @@ const FindHistoryLeft = styled(TouchableOpacity)`
 
 const FindHistoryLeftGradient = styled(LinearGradient).attrs({
     colors: ['rgba(252, 70, 70, 0.23)', 'rgba(255, 255, 255, 1)'],
-    start: {x: 1, y: 1},
-    end: {x: 0, y: 0},
+    start: { x: 1, y: 1 },
+    end: { x: 0, y: 0 },
 })`
     flex: 1;
     justify-content: center;
-`;
+` as React.ComponentType<Partial<LinearGradientProps>>;
 
 const FindHistoryLeftText = styled.Text`
     color: #171717;
@@ -70,8 +75,8 @@ const FindHistoryRightText = styled.Text`
     align-self: center;
 `;
 
-function History({ navigation }) {
-    const handlePeriodPress = (period) => {
+function History({ navigation }: HistoryProps) {
+    const handlePeriodPress = (period: number) => {
         navigation.navigate('ChatPeriod', { selectedPeriod: period });
     };
 
