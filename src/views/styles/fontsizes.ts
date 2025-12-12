@@ -1,6 +1,17 @@
 import { moderateScale } from 'react-native-size-matters';
 
-const Fontsizes = {
+interface FontSizeValue {
+    xs: number;
+    sm: number;
+    md: number;
+    mdm: number;
+    mm: number;
+    lg: number;
+    xl: number;
+    xxl: number;
+
+}
+const Fontsizes: FontSizeValue = {
     xs: moderateScale(12),
     sm: moderateScale(14),
     md: moderateScale(16),

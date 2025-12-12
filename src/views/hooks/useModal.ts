@@ -1,6 +1,13 @@
 import { useState } from 'react';
 
-const useModal = () => {
+interface UseModalReturn {
+    isModalVisible: boolean;
+    openModal: () => void;
+    closeModal: () => void;
+    toggleModal: () => void;
+}
+
+const useModal = (): UseModalReturn => {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const openModal = () => {
