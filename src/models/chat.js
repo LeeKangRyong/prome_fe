@@ -1,8 +1,19 @@
 import BASE_URL from '../config/config';
 import axios from 'axios';
 import { useAuthStore } from '../store/store';
+import { mockChatHistory, mockChats, USE_MOCK } from '../config/mock';
 
 export const ask = async (content, chatId = null) => {
+    if (USE_MOCK) {
+        return {
+            success: true,
+            chat: {
+                chat_id: chatId || 1,
+                answer: { content: 'Mock 응답입니다.', is_recommend: false, is_diag: false },
+            },
+        };
+    }
+
     try {
         const accessToken = useAuthStore.getState().accessToken;
 
@@ -32,6 +43,14 @@ export const ask = async (content, chatId = null) => {
 
 // getChatAll 함수를 getAllChats로 변경하고 period API를 사용
 export const getAllChats = async (days = 365) => {  // 기본값을 1년으로 설정해서 전체 조회
+    if (USE_MOCK) {
+        const chatsWithHistory = mockChats.map(chat => ({
+            ...chat,
+            history: mockChatHistory[chat.chat_id] || [],
+        }));
+        return { success: true, data: chatsWithHistory };
+    }
+
     try {
         const accessToken = useAuthStore.getState().accessToken;
 
@@ -55,6 +74,16 @@ export const getAllChats = async (days = 365) => {  // 기본값을 1년으로 �
 };
 
 export const getChat = async (chatId) => {
+    if (USE_MOCK) {
+        return {
+            success: true,
+            data: {
+                title: mockChats.find(c => c.chat_id === chatId)?.title || '채팅',
+                history: mockChatHistory[chatId] || [],
+            },
+        };
+    }
+
     try {
         const accessToken = useAuthStore.getState().accessToken;
 
@@ -77,6 +106,12 @@ export const getChat = async (chatId) => {
 };
 
 export const getChat7Period = async () => {
+    if (USE_MOCK) {
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const filtered = mockChats.filter(c => new Date(c.created_at) >= sevenDaysAgo);
+        return { success: true, data: filtered };
+    }
+
     try {
         const accessToken = useAuthStore.getState().accessToken;
 
@@ -100,6 +135,12 @@ export const getChat7Period = async () => {
 };
 
 export const getChat30Period = async () => {
+    if (USE_MOCK) {
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const filtered = mockChats.filter(c => new Date(c.created_at) >= thirtyDaysAgo);
+        return { success: true, data: filtered };
+    }
+
     try {
         const accessToken = useAuthStore.getState().accessToken;
 
@@ -123,6 +164,12 @@ export const getChat30Period = async () => {
 };
 
 export const getChatByPeriod = async (days) => {
+    if (USE_MOCK) {
+        const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        const filtered = mockChats.filter(c => new Date(c.created_at) >= cutoff);
+        return { success: true, data: filtered };
+    }
+
     try {
         const accessToken = useAuthStore.getState().accessToken;
 

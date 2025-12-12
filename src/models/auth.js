@@ -1,8 +1,19 @@
 import BASE_URL from '../config/config';
 import axios from 'axios';
 import { useAuthStore, useUserStore } from '../store/store';
+import { mockUser, USE_MOCK } from '../config/mock';
 
 export const login = async (id, password) => {
+    if (USE_MOCK) {
+        if (id === 'test1' && password === '1234') {
+            const data = { accessToken: 'mock-token-12345', user: mockUser, success: true };
+            useAuthStore.getState().setAccessToken(data.accessToken);
+            useUserStore.getState().setUser(data.user);
+            return data;
+        }
+        throw new Error('아이디 또는 비밀번호가 틀렸습니다.');
+    }
+
     try {
         const res = await axios.post(
             `${BASE_URL}/auth/login`,
@@ -25,6 +36,12 @@ export const login = async (id, password) => {
 };
 
 export const logout = async () => {
+    if (USE_MOCK) {
+        useAuthStore.getState().resetAccessToken();
+        useUserStore.getState().resetUser();
+        return { success: true };
+    }
+
     try {
         const accessToken = useAuthStore.getState().accessToken;
         const res = await axios.post(
@@ -49,8 +66,11 @@ export const logout = async () => {
 };
 
 export const register = async (id, password, name, age, gender, phone) => {
-    try {
+    if (USE_MOCK) {
+            return { success: true, message: '회원가입 성공' };
+        }
 
+    try {
         console.log('=== 요청 정보 ===');
         console.log('BASE_URL:', BASE_URL);
         console.log('요청 URL:', `${BASE_URL}/auth/register`);
